@@ -1,6 +1,6 @@
 module CssBasics exposing
-  ( Declaration, CssValue(..), UnitType(..), important, valueToString
-  , declarationToString, renderToAttribute
+  ( Declaration, CssValue(..), UnitType(..), important, encodeCssValue
+  , encodeDeclaration, toStyleAttribute
   )
 
 
@@ -10,8 +10,11 @@ module CssBasics exposing
 # CSS Representation
 @docs Declaration, CssValue, UnitType, important
 
-# Rendering to a CSS String or `Html.Attribute`
-@docs valueToString, declarationToString, renderToAttribute
+# Encoding CSS Values and Declarations
+@docs encodeCssValue, encodeDeclaration
+
+# Rendering to a Style Attribute
+@docs toStyleAttribute
 
 -}
 
@@ -110,10 +113,12 @@ important (property, value) =
   (property, Important value)
 
 
+-- ENCODING CSS VALUES AND DECLARATIONS
+
 {-| Convert a `CssValue` to a properly formatted string
 -}
-valueToString : CssValue number -> String
-valueToString value =
+encodeCssValue : CssValue number -> String
+encodeCssValue value =
   let
     rgbToString rgb =
       [ "rgba("
@@ -174,17 +179,17 @@ valueToString value =
 
       Sides list ->
         list
-          .|> valueToString
+          .|> encodeCssValue
           |> String.join " "
 
       Multiple separator list ->
         list
-          .|> valueToString
+          .|> encodeCssValue
           |> String.join separator
 
       Important value ->
         value
-          |> valueToString
+          |> encodeCssValue
           |++ "!important"
 
       Undefined ->
@@ -194,21 +199,23 @@ valueToString value =
 {-| Convert a `Declaration` to a string of CSS code, formatted as
 `"property:value;"`
 -}
-declarationToString : Declaration number -> String
-declarationToString (property, value) =
+encodeDeclaration : Declaration number -> String
+encodeDeclaration (property, value) =
   [ property
   , ":"
-  , value ||> valueToString
+  , value ||> encodeCssValue
   , ";"
   ]
     |> String.concat
 
 
+-- RENDERING TO A STYLE ATTRIBUTE
+
 {-| Given a list of declarations, return a `style` attribute that may be
 applied to an `Html` node
 -}
-renderToAttribute : List (Declaration number) -> Html.Attribute msg
-renderToAttribute declarationList =
+toStyleAttribute : List (Declaration number) -> Html.Attribute msg
+toStyleAttribute declarationList =
   declarationList
-    .|> (\(k, v) -> (k, v ||> valueToString))
+    .|> (\(k, v) -> (k, v ||> encodeCssValue))
     |> Attributes.style
