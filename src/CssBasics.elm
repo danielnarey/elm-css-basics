@@ -22,7 +22,6 @@ module CssBasics exposing
 import Toolkit.Operators exposing (..)
 import Html
 import Html.Attributes as Attributes
-import String
 import Color exposing (Color)
 
 
@@ -217,5 +216,5 @@ applied to an `Html` node
 toStyleAttribute : List (Declaration number) -> Html.Attribute msg
 toStyleAttribute declarationList =
   declarationList
-    .|> (\(k, v) -> (k, v ||> encodeCssValue))
+    .|> Tuple.mapSecond encodeCssValue
     |> Attributes.style
