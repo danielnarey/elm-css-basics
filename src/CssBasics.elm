@@ -121,13 +121,13 @@ encodeCssValue value =
   let
     rgbToString rgb =
       [ "rgba("
-      , rgb.red ||> toString
+      , rgb.red |> toString
       , ","
-      , rgb.green ||> toString
+      , rgb.green |> toString
       , ","
-      , rgb.blue ||> toString
+      , rgb.blue |> toString
       , ","
-      , rgb.alpha ||> toString
+      , rgb.alpha |> toString
       , ")"
       ]
         |> String.concat
