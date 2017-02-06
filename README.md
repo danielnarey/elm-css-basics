@@ -21,7 +21,6 @@ perform the calculation, otherwise return a default value.
 __Dependencies:__
 - [elm-lang/core/5.0.0](http://package.elm-lang.org/packages/elm-lang/core/5.0.0)
 - [elm-lang/html/2.0.0](http://package.elm-lang.org/packages/elm-lang/html/2.0.0)
-- [danielnarey/elm-toolkit/4.0.0](http://package.elm-lang.org/packages/danielnarey/elm-toolkit/4.0.0)
 
 __Extensions:__
 - [danielnarey/elm-stylesheet](http://package.elm-lang.org/packages/danielnarey/elm-stylesheet/latest)

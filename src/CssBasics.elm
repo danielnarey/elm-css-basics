@@ -19,7 +19,6 @@ module CssBasics exposing
 -}
 
 
-import Toolkit.Operators exposing (..)
 import Html
 import Html.Attributes as Attributes
 import Color exposing (Color)
@@ -30,8 +29,8 @@ import Color exposing (Color)
 name and the value assigned to that property. The property is given as a string
 and the value is given as a `CssValue`.
 -}
-type alias Declaration number =
-  (String, CssValue number)
+type alias Declaration =
+  (String, CssValue)
 
 
 {-| Represents the types of values that may be assigned to a style property.
@@ -71,15 +70,16 @@ value will be assigned the value
 [`inherit`](https://developer.mozilla.org/en-US/docs/Web/CSS/inherit).
 
 -}
-type CssValue number
+type CssValue
   = Str String
   | Col Color
-  | Num number
-  | Unit number UnitType
+  | Num Float
+  | Integer Int
+  | Unit Float UnitType
   | FontStack (List String)
-  | Sides (List (CssValue number))
-  | Multiple String (List (CssValue number))
-  | Important (CssValue number)
+  | Sides (List CssValue)
+  | Multiple String (List CssValue)
+  | Important CssValue
   | Undefined
 
 
@@ -107,7 +107,7 @@ type UnitType
 
 {-| Add "!important" to a style declaration
 -}
-important : Declaration number -> Declaration number
+important : Declaration -> Declaration
 important (property, value) =
   (property, Important value)
 
@@ -116,7 +116,7 @@ important (property, value) =
 
 {-| Convert a `CssValue` to a properly formatted string
 -}
-encodeCssValue : CssValue number -> String
+encodeCssValue : CssValue -> String
 encodeCssValue value =
   let
     rgbToString rgb =
@@ -133,7 +133,7 @@ encodeCssValue value =
         |> String.concat
 
     quoteMultiWord string =
-      if string ||> String.words ||> List.length > 1 then
+      if (string |> String.words |> List.length) > 1 then
         "'" ++ string ++ "'"
 
       else
@@ -166,30 +166,34 @@ encodeCssValue value =
         number
           |> toString
 
+      Integer int ->
+        int
+          |> toString
+
       Unit number unit ->
         number
           |> toString
-          |++ unit ||> unitToString
+          |> flip (++) (unit |> unitToString)
 
       FontStack list ->
         list
-          .|> quoteMultiWord
+          |> List.map quoteMultiWord
           |> String.join ","
 
       Sides list ->
         list
-          .|> encodeCssValue
+          |> List.map encodeCssValue
           |> String.join " "
 
       Multiple separator list ->
         list
-          .|> encodeCssValue
+          |> List.map encodeCssValue
           |> String.join separator
 
       Important value ->
         value
           |> encodeCssValue
-          |++ "!important"
+          |> flip (++) "!important"
 
       Undefined ->
         "inherit"
@@ -198,11 +202,11 @@ encodeCssValue value =
 {-| Convert a `Declaration` to a string of CSS code, formatted as
 `"property:value;"`
 -}
-encodeDeclaration : Declaration number -> String
+encodeDeclaration : Declaration -> String
 encodeDeclaration (property, value) =
   [ property
   , ":"
-  , value ||> encodeCssValue
+  , (value |> encodeCssValue)
   , ";"
   ]
     |> String.concat
@@ -213,8 +217,8 @@ encodeDeclaration (property, value) =
 {-| Given a list of declarations, return a `style` attribute that may be
 applied to an `Html` node
 -}
-toStyleAttribute : List (Declaration number) -> Html.Attribute msg
+toStyleAttribute : List Declaration -> Html.Attribute msg
 toStyleAttribute declarationList =
   declarationList
-    .|> Tuple.mapSecond encodeCssValue
+    |> List.map (Tuple.mapSecond encodeCssValue)
     |> Attributes.style
