@@ -171,9 +171,7 @@ encodeCssValue value =
           |> toString
 
       Unit number unit ->
-        number
-          |> toString
-          |> flip (++) (unit |> unitToString)
+        (number |> toString) ++ (unit |> unitToString)
 
       FontStack list ->
         list
@@ -191,9 +189,7 @@ encodeCssValue value =
           |> String.join separator
 
       Important value ->
-        value
-          |> encodeCssValue
-          |> flip (++) "!important"
+        (value |> encodeCssValue) ++ "!important"
 
       Undefined ->
         "inherit"
