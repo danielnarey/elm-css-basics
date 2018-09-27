@@ -1,3 +1,7 @@
+# Not updated for Elm 0.19
+
+---
+
 ## Some basic helpers for generating CSS style declarations in Elm
 
 CSS style declarations are key-value pairs consisting of a property name and a
